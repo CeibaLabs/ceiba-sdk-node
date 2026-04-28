@@ -25,4 +25,4 @@ This package is the official Node.js SDK for integrating Ceiba into Express and 
 
 All enforcement happens in **Ceiba Runtime**.
 
-## More Information coming soon =)  
+...More Information coming soon =)  
