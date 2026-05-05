@@ -16,12 +16,12 @@ This package is the official Node.js SDK for integrating Ceiba into Express and 
 - blocks unauthorized requests with standard error responses
 - keeps your app integration simple and consistent
 
-## What this package does not do
+<!-- ## What this package does not do
 
 - it does **not** validate API keys locally
 - it does **not** contain the policy engine
 - it does **not** enforce billing or entitlement rules by itself
-- it is **not** the source of truth for access decisions
+- it is **not** the source of truth for access decisions -->
 
 All enforcement happens in **Ceiba Runtime**.
 
