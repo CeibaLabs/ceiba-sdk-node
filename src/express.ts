@@ -1,7 +1,13 @@
-import type { RuntimeAuthorizeInput } from "@ceibalabs/ceiba-core-domain";
+import type { DenialReason, RuntimeAuthorizeInput } from "@ceibalabs/ceiba-core-domain";
 import { toSdkDecisionResult } from "@ceibalabs/ceiba-core-domain";
 import type { NextFunction, Request, Response } from "express";
+import {
+  ceibaErrorCodeForDenial,
+  httpStatusForDenial,
+  httpStatusForRuntimeTransport,
+} from "./denial-http.js";
 import type { CeibaRuntimeClient } from "./runtime-client.js";
+import { CeibaRuntimeTransportError } from "./runtime-client.js";
 
 function getHeader(req: Request, name: string): string | undefined {
   const v = req.headers[name.toLowerCase()];
@@ -43,14 +49,22 @@ export function ceibaExpressMiddleware(client: CeibaRuntimeClient, projectId: st
       const decision = await client.authorize(input);
       const sdk = toSdkDecisionResult(decision);
       if (!sdk.allowed) {
-        return res.status(401).json({
-          error: "ceiba_unauthorized",
-          denialReason: sdk.denialReason,
+        const denialReason: DenialReason = sdk.denialReason ?? "invalid_api_key";
+        return res.status(httpStatusForDenial(denialReason)).json({
+          error: ceibaErrorCodeForDenial(denialReason),
+          denialReason,
         });
       }
       req.ceibaAccess = sdk.accessContext!;
       next();
     } catch (e) {
+      if (e instanceof CeibaRuntimeTransportError) {
+        const status = httpStatusForRuntimeTransport(e.status);
+        return res.status(status).json({
+          error: "ceiba_runtime_transport",
+          runtimeStatus: e.status,
+        });
+      }
       next(e);
     }
   };

@@ -1,7 +1,13 @@
-import type { RuntimeAuthorizeInput } from "@ceibalabs/ceiba-core-domain";
+import type { DenialReason, RuntimeAuthorizeInput } from "@ceibalabs/ceiba-core-domain";
 import { toSdkDecisionResult } from "@ceibalabs/ceiba-core-domain";
 import type { FastifyReply, FastifyRequest, preHandlerHookHandler } from "fastify";
+import {
+  ceibaErrorCodeForDenial,
+  httpStatusForDenial,
+  httpStatusForRuntimeTransport,
+} from "./denial-http.js";
 import type { CeibaRuntimeClient } from "./runtime-client.js";
+import { CeibaRuntimeTransportError } from "./runtime-client.js";
 
 function getHeader(req: FastifyRequest, name: string): string | undefined {
   const raw = req.headers[name.toLowerCase()];
@@ -55,14 +61,26 @@ export function ceibaFastifyPreHandler(
       credential: { kind: "api_key", presentedKey },
     };
 
-    const decision = await opts.client.authorize(input);
-    const sdk = toSdkDecisionResult(decision);
-    if (!sdk.allowed) {
-      return reply.code(401).send({
-        error: "ceiba_unauthorized",
-        denialReason: sdk.denialReason,
-      });
+    try {
+      const decision = await opts.client.authorize(input);
+      const sdk = toSdkDecisionResult(decision);
+      if (!sdk.allowed) {
+        const denialReason: DenialReason = sdk.denialReason ?? "invalid_api_key";
+        return reply.code(httpStatusForDenial(denialReason)).send({
+          error: ceibaErrorCodeForDenial(denialReason),
+          denialReason,
+        });
+      }
+      request.ceibaAccess = sdk.accessContext!;
+    } catch (e) {
+      if (e instanceof CeibaRuntimeTransportError) {
+        const status = httpStatusForRuntimeTransport(e.status);
+        return reply.code(status).send({
+          error: "ceiba_runtime_transport",
+          runtimeStatus: e.status,
+        });
+      }
+      throw e;
     }
-    request.ceibaAccess = sdk.accessContext!;
   };
 }
