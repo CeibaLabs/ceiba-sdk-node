@@ -23,7 +23,7 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 - **`CeibaRuntimeClient.revokeApiKey(apiKeyId)`** → `POST /rt/projects/{projectId}/api-keys/{apiKeyId}/revoke` with `x-ceiba-project-secret` (uses config **`projectId`**).
 - **`CeibaRuntimeClient.archiveApiKey(apiKeyId)`** → `POST .../archive` (same headers).
 - **Response:** `{ apiKeyId, status: 'revoked' | 'archived' }` typed as **`ApiKeyLifecycleResult`** (exported from package entry).
-- **Errors:** non-2xx → **`CeibaRuntimeTransportError`** (same as **`authorize`**). No key creation, list, or expiry APIs in this slice.
+- **Repo:** **`0fa959f`** on **`feat/runtime-sdk-key-status-api`** (merge to **`dev`** pending review).
 
 ## Next slices
 
