@@ -26,6 +26,13 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 - **Errors:** non-2xx → **`CeibaRuntimeTransportError`** (same as **`authorize`**). No key creation, list, or expiry APIs in this slice.
 - **Repo:** feature **`0fa959f`** on **`feat/runtime-sdk-key-status-api`** (merge to **`dev`** pending review).
 
+## Week 2 (2026-05-13) — Runtime client: create API key
+
+- **`CeibaRuntimeClient.createApiKey(displayName)`** → `POST /rt/projects/{projectId}/api-keys` with JSON body and **`x-ceiba-project-secret`**.
+- **Response:** **`ApiKeyCreateResult`** — **`apiKeyId`**, **`displayName`**, **`keyPrefix`**, **`plaintextKey`** (handle **`plaintextKey`** like a secret; shown once).
+- **Errors:** non-2xx → **`CeibaRuntimeTransportError`**. No list/read/revoke/archive/expiry in this slice.
+- **Repo:** branch **`feat/runtime-sdk-key-create-api`** (merge to **`dev`** pending review).
+
 ## Next slices
 
 - Optional retries (post-MVP caution) and example apps in `ceiba-examples` once docs path unblocks.

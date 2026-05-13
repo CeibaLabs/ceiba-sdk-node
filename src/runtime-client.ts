@@ -7,6 +7,14 @@ export type ApiKeyLifecycleResult = {
   status: "revoked" | "archived";
 };
 
+/** Result of `createApiKey` — `plaintextKey` is returned once at creation. */
+export type ApiKeyCreateResult = {
+  apiKeyId: string;
+  displayName: string;
+  keyPrefix: string;
+  plaintextKey: string;
+};
+
 export class CeibaRuntimeClient {
   constructor(private readonly config: CeibaSdkConfig) {}
 
@@ -27,6 +35,29 @@ export class CeibaRuntimeClient {
     }
 
     return (await res.json()) as AccessDecision;
+  }
+
+  /**
+   * Creates an API key for this SDK config's project. Returns the full plaintext once;
+   * persist it securely — Runtime does not retain it.
+   */
+  async createApiKey(displayName: string): Promise<ApiKeyCreateResult> {
+    const url = new URL(`/rt/projects/${this.config.projectId}/api-keys`, this.config.runtimeBaseUrl);
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        "x-ceiba-project-secret": this.config.projectSecret,
+      },
+      body: JSON.stringify({ displayName }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new CeibaRuntimeTransportError(res.status, text);
+    }
+
+    return (await res.json()) as ApiKeyCreateResult;
   }
 
   /**
