@@ -2,6 +2,7 @@ export { parseCeibaSdkConfig, ceibaSdkConfigSchema, type CeibaSdkConfig } from "
 export {
   CeibaRuntimeClient,
   CeibaRuntimeTransportError,
+  type ApiKeyLifecycleResult,
 } from "./runtime-client.js";
 export {
   ceibaErrorCodeForDenial,

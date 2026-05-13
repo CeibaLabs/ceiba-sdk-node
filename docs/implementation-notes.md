@@ -18,6 +18,13 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 - **Transport → status:** Runtime **401/403** → **503** (project secret / service auth misconfiguration); **400** → **502**; **5xx** pass through; other → **502**. Response shape: `{ error: "ceiba_runtime_transport", runtimeStatus }`.
 - **Exports:** `httpStatusForDenial`, `ceibaErrorCodeForDenial`, `httpStatusForRuntimeTransport` from package entry for direct `CeibaRuntimeClient` users.
 
+## Week 2 (2026-05-13) — Runtime client: revoke and archive API keys
+
+- **`CeibaRuntimeClient.revokeApiKey(apiKeyId)`** → `POST /rt/projects/{projectId}/api-keys/{apiKeyId}/revoke` with `x-ceiba-project-secret` (uses config **`projectId`**).
+- **`CeibaRuntimeClient.archiveApiKey(apiKeyId)`** → `POST .../archive` (same headers).
+- **Response:** `{ apiKeyId, status: 'revoked' | 'archived' }` typed as **`ApiKeyLifecycleResult`** (exported from package entry).
+- **Errors:** non-2xx → **`CeibaRuntimeTransportError`** (same as **`authorize`**). No key creation, list, or expiry APIs in this slice.
+
 ## Next slices
 
 - Optional retries (post-MVP caution) and example apps in `ceiba-examples` once docs path unblocks.
