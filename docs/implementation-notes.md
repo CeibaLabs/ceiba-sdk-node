@@ -38,7 +38,7 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 - **`CeibaRuntimeClient.listApiKeys()`** → **`GET /rt/projects/{projectId}/api-keys`** with **`x-ceiba-project-secret`**; returns **`ApiKeyListResult`**.
 - **`CeibaRuntimeClient.getApiKey(apiKeyId)`** → **`GET .../api-keys/{apiKeyId}`** (same header).
 - **Types:** **`ApiKeySummary`**, **`ApiKeyListResult`** exported from package entry. No create/revoke/archive/expiry changes in this slice.
-- **Repo:** branch **`feat/runtime-sdk-key-read-list`** (merge to **`dev`** pending review).
+- **Repo:** feature **`2b06263`** on **`feat/runtime-sdk-key-read-list`** (merge to **`dev`** pending review).
 
 ## Next slices
 
