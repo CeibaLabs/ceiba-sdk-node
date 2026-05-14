@@ -4,6 +4,8 @@ export {
   CeibaRuntimeTransportError,
   type ApiKeyCreateResult,
   type ApiKeyLifecycleResult,
+  type ApiKeyListResult,
+  type ApiKeySummary,
 } from "./runtime-client.js";
 export {
   ceibaErrorCodeForDenial,

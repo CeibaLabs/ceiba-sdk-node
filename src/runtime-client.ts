@@ -15,6 +15,23 @@ export type ApiKeyCreateResult = {
   plaintextKey: string;
 };
 
+/** Safe read model for an API key (no hash or plaintext). ISO date strings from Runtime. */
+export type ApiKeySummary = {
+  apiKeyId: string;
+  displayName: string;
+  keyPrefix: string;
+  status: "active" | "revoked" | "archived";
+  createdAt: string;
+  expiresAt: string | null;
+  revokedAt: string | null;
+  archivedAt: string | null;
+  lastUsedAt: string | null;
+};
+
+export type ApiKeyListResult = {
+  apiKeys: ApiKeySummary[];
+};
+
 export class CeibaRuntimeClient {
   constructor(private readonly config: CeibaSdkConfig) {}
 
@@ -60,6 +77,20 @@ export class CeibaRuntimeClient {
     return (await res.json()) as ApiKeyCreateResult;
   }
 
+  /** Lists API keys for this SDK config's project (no secret material). */
+  async listApiKeys(): Promise<ApiKeyListResult> {
+    return (await this.getApiKeyJson(
+      `/rt/projects/${this.config.projectId}/api-keys`,
+    )) as ApiKeyListResult;
+  }
+
+  /** Fetches one API key by id for this project (404 from Runtime if missing / wrong project). */
+  async getApiKey(apiKeyId: string): Promise<ApiKeySummary> {
+    return (await this.getApiKeyJson(
+      `/rt/projects/${this.config.projectId}/api-keys/${apiKeyId}`,
+    )) as ApiKeySummary;
+  }
+
   /**
    * Revokes an API key for this SDK config's project (requires active project + valid secret).
    * Idempotent when the key is already revoked. Archived keys cannot be revoked (Runtime returns 409).
@@ -95,6 +126,23 @@ export class CeibaRuntimeClient {
     }
 
     return (await res.json()) as ApiKeyLifecycleResult;
+  }
+
+  private async getApiKeyJson(path: string): Promise<unknown> {
+    const url = new URL(path, this.config.runtimeBaseUrl);
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "x-ceiba-project-secret": this.config.projectSecret,
+      },
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new CeibaRuntimeTransportError(res.status, text);
+    }
+
+    return res.json();
   }
 }
 
