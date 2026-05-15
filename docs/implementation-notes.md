@@ -44,7 +44,7 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 
 - **`CeibaRuntimeClient.setApiKeyExpiry(apiKeyId, expiresAt)`** → **`PATCH /rt/projects/{projectId}/api-keys/{apiKeyId}`** with **`{ expiresAt: string | null }`** and **`x-ceiba-project-secret`**; returns **`ApiKeySummary`**.
 - **Errors:** non-2xx → **`CeibaRuntimeTransportError`** (including **409** when key is not **active**). No other route changes in this slice.
-- **Repo:** branch **`feat/runtime-sdk-key-expiry`** (merge to **`dev`** pending review).
+- **Repo:** feature **`7576ac1`** on **`feat/runtime-sdk-key-expiry`** (merge to **`dev`** pending review).
 
 ## Next slices
 
