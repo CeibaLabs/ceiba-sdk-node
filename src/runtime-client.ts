@@ -92,6 +92,32 @@ export class CeibaRuntimeClient {
   }
 
   /**
+   * Sets or clears this key's expiry (`expiresAt`). Only **active** keys accept updates (Runtime **409** otherwise).
+   * Pass **`null`** to clear expiry. Returns the updated read model.
+   */
+  async setApiKeyExpiry(apiKeyId: string, expiresAt: string | null): Promise<ApiKeySummary> {
+    const url = new URL(
+      `/rt/projects/${this.config.projectId}/api-keys/${apiKeyId}`,
+      this.config.runtimeBaseUrl,
+    );
+    const res = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "content-type": "application/json",
+        "x-ceiba-project-secret": this.config.projectSecret,
+      },
+      body: JSON.stringify({ expiresAt }),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      throw new CeibaRuntimeTransportError(res.status, text);
+    }
+
+    return (await res.json()) as ApiKeySummary;
+  }
+
+  /**
    * Revokes an API key for this SDK config's project (requires active project + valid secret).
    * Idempotent when the key is already revoked. Archived keys cannot be revoked (Runtime returns 409).
    */
