@@ -46,6 +46,11 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 - **Errors:** non-2xx → **`CeibaRuntimeTransportError`** (including **409** when key is not **active**). No other route changes in this slice.
 - **Repo:** feature **`7576ac1`** on **`feat/runtime-sdk-key-expiry`** (merge to **`dev`** pending review).
 
+## Launch validation (2026-05-19, read-only)
+
+- **`dev`** at **`f35608e`**: `npm run typecheck` + `npm run build` pass; `CeibaRuntimeClient` surface matches Runtime `/rt/authorize` + api-keys routes documented in `ceiba-docs`.
+- `npm run prove` not run (requires live Runtime env).
+
 ## Next slices
 
 - Optional retries (post-MVP caution) and example apps in `ceiba-examples` once docs path unblocks.
