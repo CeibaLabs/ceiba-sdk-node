@@ -83,7 +83,7 @@ app.get("/api/weather", async (request, reply) => {
 await app.listen({ port: 3000 });
 ```
 
-## Core idea
+## Core Architecture (High-level)
 
 Ceiba separates:
 
