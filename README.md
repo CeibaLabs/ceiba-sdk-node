@@ -89,9 +89,7 @@ Ceiba separates:
 
 - **Control Plane** — where API owners configure projects, keys, policies, plans, and billing
 - **Runtime** — where access decisions are evaluated and enforced
-- **SDK** — the integration layer installed in the customer’s API
-
-This package is the **integration layer**.
+- **SDK** — the integration layer installed in the customer’s API (this package)
 
 ## Typical use cases
 
