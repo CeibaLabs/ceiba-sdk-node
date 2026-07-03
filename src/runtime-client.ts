@@ -144,6 +144,7 @@ export class CeibaRuntimeClient {
         "content-type": "application/json",
         "x-ceiba-project-secret": this.config.projectSecret,
       },
+      body: JSON.stringify({}),
     });
 
     if (!res.ok) {

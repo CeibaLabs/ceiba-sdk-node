@@ -54,3 +54,9 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 ## Next slices
 
 - Optional retries (post-MVP caution) and example apps in `ceiba-examples` once docs path unblocks.
+
+## 2026-07-03 — API-key lifecycle empty JSON payload
+
+- `revokeApiKey` and `archiveApiKey` now send an explicit empty JSON object because their shared lifecycle helper sets `Content-Type: application/json`.
+- Added focused request-construction coverage for both lifecycle methods.
+- Public method signatures, Runtime routes, response types, and lifecycle semantics are unchanged.

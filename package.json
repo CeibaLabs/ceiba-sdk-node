@@ -17,6 +17,7 @@
   "scripts": {
     "build": "tsup",
     "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test 'src/test/**/*.test.ts'",
     "prove": "tsx scripts/prove-authorize.ts"
   },
   "dependencies": {
