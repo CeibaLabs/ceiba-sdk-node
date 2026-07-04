@@ -12,6 +12,12 @@ const requiredOutputs = [
   resolve(distRoot, "index.js"),
   resolve(distRoot, "index.cjs"),
   resolve(distRoot, "index.d.ts"),
+  resolve(distRoot, "express.js"),
+  resolve(distRoot, "express.cjs"),
+  resolve(distRoot, "express.d.ts"),
+  resolve(distRoot, "fastify.js"),
+  resolve(distRoot, "fastify.cjs"),
+  resolve(distRoot, "fastify.d.ts"),
 ];
 
 for (const output of requiredOutputs) {

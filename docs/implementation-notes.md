@@ -69,3 +69,12 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 - Added a `prepack` build and boundary check that rejects missing output, private-package references, and local absolute paths.
 - Added `npm run smoke:package`, which packs into a temporary directory, scans the extracted artifact, installs it in a clean external fixture, loads ESM and CommonJS entries, compiles public contract imports, and removes the fixture.
 - Verification passed: clean `npm ci`, 3 tests, typecheck, build, dry-run pack, packed-artifact scan, clean-fixture ESM/CommonJS/declaration smoke, production dependency audit with zero vulnerabilities, and diff hygiene.
+
+## 2026-07-04 — Optional adapter package boundary review
+
+- Founder review tightened the clean-consumer declaration smoke by removing `skipLibCheck`; this exposed root declarations that required both optional framework peers even for Runtime-client-only consumers.
+- Split the published SDK into a framework-free root entry plus `@ceibalabs/ceiba-sdk/express` and `@ceibalabs/ceiba-sdk/fastify` adapter entrypoints.
+- Core ESM, CommonJS, and declarations now load and compile without Express or Fastify installed.
+- Adapter entrypoints retain framework-native request augmentation and handler compatibility, verified strictly against Express and Fastify types.
+- The packed artifact smoke now checks root and adapter runtime resolution, strict core declarations without peers, and strict framework declarations with their peer types installed.
+- Typecheck, 3 tests, build, package-boundary verification, dry-run pack, external fixture smoke, production dependency audit, and diff hygiene pass.

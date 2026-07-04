@@ -72,6 +72,8 @@ try {
   httpStatusForDenial,
   parseCeibaSdkConfig,
 } from "@ceibalabs/ceiba-sdk";
+import { ceibaExpressMiddleware } from "@ceibalabs/ceiba-sdk/express";
+import { ceibaFastifyPreHandler } from "@ceibalabs/ceiba-sdk/fastify";
 
 const config = parseCeibaSdkConfig({
   runtimeBaseUrl: "https://runtime.example.test",
@@ -80,7 +82,12 @@ const config = parseCeibaSdkConfig({
 });
 const client = new CeibaRuntimeClient(config);
 
-if (typeof client.authorize !== "function" || httpStatusForDenial("rate_limited") !== 429) {
+if (
+  typeof client.authorize !== "function" ||
+  typeof ceibaExpressMiddleware !== "function" ||
+  typeof ceibaFastifyPreHandler !== "function" ||
+  httpStatusForDenial("rate_limited") !== 429
+) {
   throw new Error("ESM public SDK smoke failed.");
 }
 `,
@@ -94,6 +101,8 @@ if (typeof client.authorize !== "function" || httpStatusForDenial("rate_limited"
   httpStatusForDenial,
   parseCeibaSdkConfig,
 } = require("@ceibalabs/ceiba-sdk");
+const { ceibaExpressMiddleware } = require("@ceibalabs/ceiba-sdk/express");
+const { ceibaFastifyPreHandler } = require("@ceibalabs/ceiba-sdk/fastify");
 
 const config = parseCeibaSdkConfig({
   runtimeBaseUrl: "https://runtime.example.test",
@@ -102,7 +111,12 @@ const config = parseCeibaSdkConfig({
 });
 const client = new CeibaRuntimeClient(config);
 
-if (typeof client.authorize !== "function" || httpStatusForDenial("missing_api_key") !== 401) {
+if (
+  typeof client.authorize !== "function" ||
+  typeof ceibaExpressMiddleware !== "function" ||
+  typeof ceibaFastifyPreHandler !== "function" ||
+  httpStatusForDenial("missing_api_key") !== 401
+) {
   throw new Error("CommonJS public SDK smoke failed.");
 }
 `,
@@ -141,7 +155,6 @@ void reason;
       resolve(projectRoot, "node_modules/typescript/bin/tsc"),
       "--noEmit",
       "--strict",
-      "--skipLibCheck",
       "--target",
       "ES2022",
       "--module",
@@ -153,8 +166,61 @@ void reason;
     consumerRoot,
   );
 
+  run(
+    "npm",
+    [
+      "install",
+      "--ignore-scripts",
+      "--no-audit",
+      "--no-fund",
+      "--package-lock=false",
+      "express@^4.21.2",
+      "@types/express@^5.0.0",
+      "@types/node@^22.10.5",
+      "fastify@^5.2.1",
+    ],
+    consumerRoot,
+  );
+
+  writeFileSync(
+    join(consumerRoot, "framework-types-smoke.ts"),
+    `import type { RequestHandler } from "express";
+import type { preHandlerHookHandler } from "fastify";
+import { ceibaExpressMiddleware } from "@ceibalabs/ceiba-sdk/express";
+import { ceibaFastifyPreHandler } from "@ceibalabs/ceiba-sdk/fastify";
+import type { CeibaRuntimeClient } from "@ceibalabs/ceiba-sdk";
+
+declare const client: CeibaRuntimeClient;
+
+const expressHandler: RequestHandler = ceibaExpressMiddleware(client, "project-id");
+const fastifyHandler: preHandlerHookHandler = ceibaFastifyPreHandler({
+  client,
+  projectId: "project-id",
+});
+
+void expressHandler;
+void fastifyHandler;
+`,
+  );
+  run(
+    process.execPath,
+    [
+      resolve(projectRoot, "node_modules/typescript/bin/tsc"),
+      "--noEmit",
+      "--strict",
+      "--target",
+      "ES2022",
+      "--module",
+      "NodeNext",
+      "--moduleResolution",
+      "NodeNext",
+      "framework-types-smoke.ts",
+    ],
+    consumerRoot,
+  );
+
   console.log(
-    `Packed package smoke passed for ${basename(tarball)}: artifact scan, ESM, CommonJS, and declarations.`,
+    `Packed package smoke passed for ${basename(tarball)}: artifact scan, core ESM/CommonJS/declarations, and framework adapter declarations.`,
   );
 } finally {
   rmSync(fixtureRoot, { recursive: true, force: true });

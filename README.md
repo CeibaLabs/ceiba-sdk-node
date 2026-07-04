@@ -37,9 +37,9 @@ npm install @ceibalabs/ceiba-sdk
 import express from "express";
 import {
   CeibaRuntimeClient,
-  ceibaExpressMiddleware,
   parseCeibaSdkConfig,
 } from "@ceibalabs/ceiba-sdk";
+import { ceibaExpressMiddleware } from "@ceibalabs/ceiba-sdk/express";
 
 const app = express();
 const config = parseCeibaSdkConfig({
@@ -65,9 +65,9 @@ app.listen(3000);
 import Fastify from "fastify";
 import {
   CeibaRuntimeClient,
-  ceibaFastifyPreHandler,
   parseCeibaSdkConfig,
 } from "@ceibalabs/ceiba-sdk";
+import { ceibaFastifyPreHandler } from "@ceibalabs/ceiba-sdk/fastify";
 
 const app = Fastify();
 const config = parseCeibaSdkConfig({

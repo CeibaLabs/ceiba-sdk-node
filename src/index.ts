@@ -12,9 +12,6 @@ export {
   httpStatusForDenial,
   httpStatusForRuntimeTransport,
 } from "./denial-http.js";
-export { ceibaExpressMiddleware } from "./express.js";
-export { ceibaFastifyPreHandler, type CeibaFastifyPreHandlerOptions } from "./fastify.js";
-
 export type {
   RuntimeAuthorizeInput,
   AccessDecision,
