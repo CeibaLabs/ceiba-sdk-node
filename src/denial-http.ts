@@ -1,4 +1,4 @@
-import type { DenialReason } from "@ceibalabs/ceiba-core-domain";
+import type { DenialReason } from "./contracts.js";
 
 /**
  * Maps Runtime `denialReason` to an HTTP status for the host application's response.

@@ -1,5 +1,3 @@
-# Ceiba SDK (Node.js)
-
 # Ceiba SDK
 
 Add API keys, plans, quotas, usage-aware access control, and subscription-gated protection to your existing Node API.
@@ -37,22 +35,24 @@ npm install @ceibalabs/ceiba-sdk
 
 ```ts
 import express from "express";
-import { protect } from "@ceibalabs/ceiba-sdk/express";
+import {
+  CeibaRuntimeClient,
+  ceibaExpressMiddleware,
+  parseCeibaSdkConfig,
+} from "@ceibalabs/ceiba-sdk";
 
 const app = express();
+const config = parseCeibaSdkConfig({
+  runtimeBaseUrl: process.env.CEIBA_RUNTIME_URL,
+  projectId: process.env.CEIBA_PROJECT_ID,
+  projectSecret: process.env.CEIBA_PROJECT_SECRET,
+});
+const client = new CeibaRuntimeClient(config);
 
-app.use(
-  protect({
-    projectId: process.env.CEIBA_PROJECT_ID!,
-    runtimeUrl: process.env.CEIBA_RUNTIME_URL!,
-    projectSecret: process.env.CEIBA_PROJECT_SECRET!,
-  })
-);
-
-app.get("/api/weather", (req, res) => {
+app.get("/api/weather", ceibaExpressMiddleware(client, config.projectId), (req, res) => {
   res.json({
     ok: true,
-    ceiba: req.ceiba,
+    ceiba: req.ceibaAccess,
   });
 });
 
@@ -63,22 +63,28 @@ app.listen(3000);
 
 ```ts
 import Fastify from "fastify";
-import { ceibaPlugin } from "@ceibalabs/ceiba-sdk/fastify";
+import {
+  CeibaRuntimeClient,
+  ceibaFastifyPreHandler,
+  parseCeibaSdkConfig,
+} from "@ceibalabs/ceiba-sdk";
 
 const app = Fastify();
-
-await app.register(ceibaPlugin, {
-  projectId: process.env.CEIBA_PROJECT_ID!,
-  runtimeUrl: process.env.CEIBA_RUNTIME_URL!,
-  projectSecret: process.env.CEIBA_PROJECT_SECRET!,
+const config = parseCeibaSdkConfig({
+  runtimeBaseUrl: process.env.CEIBA_RUNTIME_URL,
+  projectId: process.env.CEIBA_PROJECT_ID,
+  projectSecret: process.env.CEIBA_PROJECT_SECRET,
 });
+const client = new CeibaRuntimeClient(config);
 
-app.get("/api/weather", async (request, reply) => {
-  return {
+app.get(
+  "/api/weather",
+  { preHandler: ceibaFastifyPreHandler({ client, projectId: config.projectId }) },
+  async (request) => ({
     ok: true,
-    ceiba: request.ceiba,
-  };
-});
+    ceiba: request.ceibaAccess,
+  }),
+);
 
 await app.listen({ port: 3000 });
 ```
@@ -101,9 +107,8 @@ Ceiba separates:
 ## Docs
 
 - Main site: https://useceiba.com
-- Docs: https://useceiba.com/docs
+- Quickstart: https://docs.useceiba.com/quickstart
 
 ## License
 
 MIT
-

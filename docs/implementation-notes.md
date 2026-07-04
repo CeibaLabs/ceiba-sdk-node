@@ -60,3 +60,12 @@ Canonical npm name: `@ceibalabs/ceiba-sdk`. Local CeibaLabs folder: `ceiba-sdk-n
 - `revokeApiKey` and `archiveApiKey` now send an explicit empty JSON object because their shared lifecycle helper sets `Content-Type: application/json`.
 - Added focused request-construction coverage for both lifecycle methods.
 - Public method signatures, Runtime routes, response types, and lifecycle semantics are unchanged.
+
+## 2026-07-03 — Public package boundary
+
+- Replaced the SDK's local/private Core Domain dependency with an SDK-owned contracts module containing only the existing public authorize request, access decision, denial, and access-context shapes plus the unchanged decision mapper.
+- Removed `@ceibalabs/ceiba-core-domain` from the manifest, lockfile, tsup externals, generated JavaScript, declarations, source maps, and packed artifact.
+- Added canonical repository, homepage, issue tracker, public publish access, and Node `>=20` package metadata while preserving optional Express and Fastify peers.
+- Added a `prepack` build and boundary check that rejects missing output, private-package references, and local absolute paths.
+- Added `npm run smoke:package`, which packs into a temporary directory, scans the extracted artifact, installs it in a clean external fixture, loads ESM and CommonJS entries, compiles public contract imports, and removes the fixture.
+- Verification passed: clean `npm ci`, 3 tests, typecheck, build, dry-run pack, packed-artifact scan, clean-fixture ESM/CommonJS/declaration smoke, production dependency audit with zero vulnerabilities, and diff hygiene.

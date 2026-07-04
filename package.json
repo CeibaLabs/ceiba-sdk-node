@@ -18,10 +18,12 @@
     "build": "tsup",
     "typecheck": "tsc --noEmit",
     "test": "node --import tsx --test 'src/test/**/*.test.ts'",
-    "prove": "tsx scripts/prove-authorize.ts"
+    "prove": "tsx scripts/prove-authorize.ts",
+    "verify:pack": "node scripts/verify-package-boundary.mjs",
+    "smoke:package": "node scripts/smoke-packed-package.mjs",
+    "prepack": "npm run build && npm run verify:pack"
   },
   "dependencies": {
-    "@ceibalabs/ceiba-core-domain": "file:../ceiba-core-domain",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -39,6 +41,20 @@
   "peerDependenciesMeta": {
     "express": { "optional": true },
     "fastify": { "optional": true }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CeibaLabs/ceiba-sdk-node.git"
+  },
+  "homepage": "https://github.com/CeibaLabs/ceiba-sdk-node#readme",
+  "bugs": {
+    "url": "https://github.com/CeibaLabs/ceiba-sdk-node/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "license": "MIT",
   "keywords": ["ceiba", "api", "express", "fastify", "middleware"],

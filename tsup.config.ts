@@ -6,5 +6,5 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  external: ["express", "fastify", "@ceibalabs/ceiba-core-domain", "zod"],
+  external: ["express", "fastify", "zod"],
 });

@@ -21,4 +21,4 @@ export type {
   SdkDecisionResult,
   CeibaAccessContext,
   DenialReason,
-} from "@ceibalabs/ceiba-core-domain";
+} from "./contracts.js";

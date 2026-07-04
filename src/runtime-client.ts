@@ -1,5 +1,5 @@
-import type { AccessDecision, RuntimeAuthorizeInput } from "@ceibalabs/ceiba-core-domain";
 import type { CeibaSdkConfig } from "./config.js";
+import type { AccessDecision, RuntimeAuthorizeInput } from "./contracts.js";
 
 /** Result of `revokeApiKey` / `archiveApiKey` (Runtime machine-facing lifecycle). */
 export type ApiKeyLifecycleResult = {

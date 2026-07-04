@@ -1,6 +1,10 @@
-import type { DenialReason, RuntimeAuthorizeInput } from "@ceibalabs/ceiba-core-domain";
-import { toSdkDecisionResult } from "@ceibalabs/ceiba-core-domain";
 import type { NextFunction, Request, Response } from "express";
+import type {
+  CeibaAccessContext,
+  DenialReason,
+  RuntimeAuthorizeInput,
+} from "./contracts.js";
+import { toSdkDecisionResult } from "./contracts.js";
 import {
   ceibaErrorCodeForDenial,
   httpStatusForDenial,
@@ -74,7 +78,7 @@ declare global {
   namespace Express {
     interface Request {
       /** Populated after successful Ceiba authorization. */
-      ceibaAccess?: import("@ceibalabs/ceiba-core-domain").CeibaAccessContext;
+      ceibaAccess?: CeibaAccessContext;
     }
   }
 }

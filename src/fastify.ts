@@ -1,6 +1,10 @@
-import type { DenialReason, RuntimeAuthorizeInput } from "@ceibalabs/ceiba-core-domain";
-import { toSdkDecisionResult } from "@ceibalabs/ceiba-core-domain";
 import type { FastifyReply, FastifyRequest, preHandlerHookHandler } from "fastify";
+import type {
+  CeibaAccessContext,
+  DenialReason,
+  RuntimeAuthorizeInput,
+} from "./contracts.js";
+import { toSdkDecisionResult } from "./contracts.js";
 import {
   ceibaErrorCodeForDenial,
   httpStatusForDenial,
@@ -39,7 +43,7 @@ export type CeibaFastifyPreHandlerOptions = {
 
 declare module "fastify" {
   interface FastifyRequest {
-    ceibaAccess?: import("@ceibalabs/ceiba-core-domain").CeibaAccessContext;
+    ceibaAccess?: CeibaAccessContext;
   }
 }
 
