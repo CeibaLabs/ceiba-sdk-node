@@ -1,5 +1,12 @@
 # Ceiba SDK
 
+[![CI](https://github.com/CeibaLabs/ceiba-sdk-node/actions/workflows/ci.yml/badge.svg?branch=dev)](https://github.com/CeibaLabs/ceiba-sdk-node/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/%40ceibalabs%2Fceiba-sdk.svg)](https://www.npmjs.com/package/@ceibalabs/ceiba-sdk)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node >=20](https://img.shields.io/badge/node-%3E%3D20-brightgreen.svg)](package.json)
+
+[Docs](https://docs.useceiba.com) · [Quickstart](https://docs.useceiba.com/quickstart) · [Examples](https://github.com/CeibaLabs/ceiba-examples) · [Issues](https://github.com/CeibaLabs/ceiba-sdk-node/issues)
+
 Add API keys, plans, quotas, usage-aware access control, and subscription-gated protection to your existing Node API.
 
 Ceiba is a lightweight, Node-first API productization layer for teams that want to protect and commercialize an API **without adopting a full gateway**.
