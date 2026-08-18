@@ -9,14 +9,27 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    # This is a published package whose package.json declares
+    # `engines: { node: ">=20" }`. Testing only one version would leave that
+    # claim unverified — a Node 20 regression could ship to consumers
+    # unnoticed. The matrix tests the floor of the supported range and the
+    # version production actually runs (the app images are node:22-alpine),
+    # so the claim and the testing agree. If this matrix is ever narrowed,
+    # narrow `engines` in the same change.
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ["20", "22"]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: ${{ matrix.node-version }}
           cache: "npm"
 
       - name: Install dependencies
