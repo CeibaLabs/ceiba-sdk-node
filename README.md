@@ -111,10 +111,14 @@ Ceiba separates:
 - enforce quotas and limits using Ceiba Runtime
 - attach a normalized access context to downstream handlers
 
-## Docs
+## Ceiba ecosystem
 
-- Main site: https://useceiba.com
-- Quickstart: https://docs.useceiba.com/quickstart
+- **Site** — <https://useceiba.com>
+- **Docs** — <https://docs.useceiba.com> · [Quickstart](https://docs.useceiba.com/quickstart)
+- **Control Plane** — <https://app.useceiba.com>
+- **Node SDK** — this repository ([`@ceibalabs/ceiba-sdk`](https://www.npmjs.com/package/@ceibalabs/ceiba-sdk))
+- **Examples** — [ceiba-examples](https://github.com/CeibaLabs/ceiba-examples)
+- **Infrastructure** — [ceiba-infra](https://github.com/CeibaLabs/ceiba-infra)
 
 ## License
 
