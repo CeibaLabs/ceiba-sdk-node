@@ -30,11 +30,42 @@ This package is the official Node.js SDK for integrating Ceiba into Express and 
 
 All enforcement happens in **Ceiba Runtime**.
 
-## Install
+## Quickstart
+
+Five steps from nothing to a protected route.
+
+**1. Install**
 
 ```bash
 npm install @ceibalabs/ceiba-sdk
 ```
+
+**2. Create a project** in the [Control Plane](https://app.useceiba.com). Note the **project ID**, and
+copy the **project secret** — it is shown once, at creation, and never again.
+
+**3. Add an access policy** for the route you want to protect. The pattern is either an exact path or
+a trailing `*` for a prefix: `/v1/*` covers `/v1` and everything beneath it. A pattern with no `*`
+matches only that one path.
+
+**4. Set three variables** on your API server. These stay server-side — `CEIBA_PROJECT_SECRET`
+authenticates your backend to Runtime and must never reach a browser or mobile client.
+
+```bash
+CEIBA_RUNTIME_URL=https://api.useceiba.com
+CEIBA_PROJECT_ID=<your-project-id>
+CEIBA_PROJECT_SECRET=<your-project-secret>
+```
+
+**5. Wire the middleware** onto that route — see the framework examples below.
+
+Then issue an API key to a caller (Control Plane, or [programmatically](https://docs.useceiba.com/programmatic-api-keys))
+and test it:
+
+```bash
+curl -H "Authorization: Bearer <api-key>" https://your-api.example.com/v1/hello
+```
+
+The SDK also accepts the key as `X-API-Key` if a `Bearer` token does not suit your callers.
 
 ## Quick example
 
@@ -95,6 +126,61 @@ app.get(
 
 await app.listen({ port: 3000 });
 ```
+
+## What you get back
+
+On an allowed request the middleware attaches `req.ceibaAccess` (Express) or
+`request.ceibaAccess` (Fastify) and calls through to your handler:
+
+```ts
+type CeibaAccessContext = {
+  projectId: string;
+  policyId: string | null;            // the policy that matched
+  apiKeyId: string | null;            // the key that was presented
+  externalSubjectType: string | null; // your own caller taxonomy, if set on the key
+  externalSubjectId: string | null;   // your own caller identifier, if set on the key
+  planCode: string | null;            // "free" | "starter" | "pro"
+  subscriptionStatus: string | null;  // e.g. "active", "trialing"
+};
+```
+
+`planCode` and `subscriptionStatus` are the useful ones for gating behaviour inside your handler —
+you can vary a response by plan without a second lookup.
+
+## When a request is denied
+
+Your handler is **not** called. The middleware sends a JSON body and an appropriate status itself:
+
+```json
+{ "error": "ceiba_forbidden", "denialReason": "policy_no_match" }
+```
+
+There are nine denial reasons, across four error codes and three statuses:
+
+| Status | `error` | `denialReason` | Meaning |
+|---|---|---|---|
+| `401` | `ceiba_unauthorized` | `missing_api_key` | No `Authorization: Bearer` or `X-API-Key` on the request |
+| `401` | `ceiba_unauthorized` | `invalid_api_key` | Key is not recognised for this project |
+| `401` | `ceiba_unauthorized` | `revoked_api_key` | Key was revoked |
+| `401` | `ceiba_unauthorized` | `archived_api_key` | Key was archived |
+| `401` | `ceiba_unauthorized` | `expired_api_key` | Key passed its `expiresAt` |
+| `403` | `ceiba_forbidden` | `policy_no_match` | No active policy matches this method and path |
+| `403` | `ceiba_forbidden` | `inactive_subscription` | The project's subscription is not active or trialing |
+| `429` | `ceiba_quota_exceeded` | `quota_exceeded` | Monthly request quota is used up |
+| `429` | `ceiba_rate_limited` | `rate_limited` | Per-minute rate limit hit |
+
+Branch on `denialReason` rather than `error` — it is the specific one, and `error` only groups them.
+
+**Only the two `429`s are worth retrying.** Everything else is a configuration or credential problem
+and will fail again identically.
+
+`policy_no_match` is the one most people hit first, and it is almost always the policy pattern rather
+than the key — check that the pattern actually covers the path being called. A pattern without a
+trailing `*` matches only that exact path.
+
+If Runtime itself is unreachable, the middleware responds
+`{ "error": "ceiba_runtime_transport", "runtimeStatus": <number> }` instead. That is an availability
+problem, not an authorization one, and is worth alerting on separately.
 
 ## Core Architecture (High-level)
 
