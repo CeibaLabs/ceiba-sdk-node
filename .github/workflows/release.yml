@@ -34,7 +34,14 @@ jobs:
         # npm CLI >= 11.5.1 is required to exchange the GitHub Actions OIDC
         # token for a publish token. Pin explicitly rather than relying on
         # whatever npm ships bundled with the selected Node.js version.
-        run: npm install -g npm@latest
+        #
+        # Pinned to the 11 line, NOT `@latest`. On 2026-09-29 — the first time
+        # this workflow ever ran — `npm@latest` resolved to 12.1.0, which
+        # requires Node ^22.22.2 || ^24.15.0 || >=26, and the job died on
+        # EBADENGINE before installing anything. `@latest` in a release
+        # pipeline means the pipeline breaks on someone else's release
+        # schedule; 11.x satisfies the OIDC floor and runs on Node 20.
+        run: npm install -g npm@^11.5.1
 
       - name: Install dependencies
         run: npm ci
