@@ -1,6 +1,6 @@
 {
   "name": "@ceibalabs/ceiba-sdk",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Node SDK for adding API keys, quotas, and subscription-gated access to Express and Fastify APIs.",
   "type": "module",
   "main": "./dist/index.cjs",
