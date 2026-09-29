@@ -1,0 +1,86 @@
+name: SDK Release
+
+# Tag-triggered release proof for @ceibalabs/ceiba-sdk (see workspace decision D-040).
+# This workflow never runs on a push to main/dev and never runs on pull requests.
+# `workflow_dispatch` exists only so the pipeline can be dry-run without publishing;
+# the publish step below is gated to real tag pushes only.
+on:
+  push:
+    tags:
+      - "v*.*.*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  # Required for npm trusted publishing (OIDC). Harmless no-op until the package's
+  # Trusted Publisher is registered on npmjs.com for this exact repo + workflow path.
+  id-token: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+          cache: "npm"
+
+      - name: Ensure npm supports trusted publishing (OIDC)
+        # npm CLI >= 11.5.1 is required to exchange the GitHub Actions OIDC
+        # token for a publish token. Pin explicitly rather than relying on
+        # whatever npm ships bundled with the selected Node.js version.
+        run: npm install -g npm@latest
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Clean external-fixture package smoke
+        # Packs, extracts, scans, and installs the tarball into a disposable
+        # fixture outside this checkout, then loads ESM/CommonJS entrypoints
+        # and compiles both core and framework-adapter type declarations.
+        # `npm pack` inside this script triggers the package's own `prepack`
+        # lifecycle hook, which re-runs the build and `verify:pack` boundary
+        # check against the freshly packed artifact.
+        run: npm run smoke:package
+
+      - name: Print package name
+        run: node -p "require('./package.json').name"
+
+      - name: Publish to npm (trusted publishing / OIDC)
+        # Only ever runs on an actual tag push, never on a workflow_dispatch
+        # dry run, so validating this workflow cannot trigger a real publish.
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        run: npm publish --access public
+        # No NPM_TOKEN/NODE_AUTH_TOKEN is read here. With the `id-token: write`
+        # permission above and this package's Trusted Publisher registered on
+        # npmjs.com against this exact repo and this workflow file path, the
+        # npm CLI exchanges the GitHub Actions OIDC token for a short-lived
+        # publish token automatically.
+        #
+        # Fallback, only if Trusted Publisher registration is not yet in place:
+        # replace the step above with a token-based publish, still gated behind
+        # the same tag-only condition, e.g.:
+        #
+        #   - name: Publish to npm (token fallback)
+        #     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/')
+        #     run: npm publish --access public
+        #     env:
+        #       NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        #
+        # OIDC trusted publishing remains the preferred long-term path; the
+        # token fallback is documentation only and is not wired as an active
+        # step in this branch.

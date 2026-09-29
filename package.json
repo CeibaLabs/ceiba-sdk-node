@@ -1,14 +1,72 @@
 {
-  "name": "ceiba",
-  "version": "0.0.1",
-  "description": "Ceiba is a lightweight API access and monetization layer for modern APIs.",
+  "name": "@ceibalabs/ceiba-sdk",
+  "version": "0.1.0",
+  "description": "Node SDK for adding API keys, quotas, and subscription-gated access to Express and Fastify APIs.",
   "type": "module",
-  "main": "dis/index.js",
-  "files": ["dist", "README.md", "LICENSE"],
-  "license": "MIT",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./express": {
+      "types": "./dist/express.d.ts",
+      "import": "./dist/express.js",
+      "require": "./dist/express.cjs"
+    },
+    "./fastify": {
+      "types": "./dist/fastify.d.ts",
+      "import": "./dist/fastify.js",
+      "require": "./dist/fastify.cjs"
+    }
   },
-  "keywords": [],
+  "files": ["dist", "README.md", "LICENSE"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc --noEmit",
+    "test": "node --import tsx --test src/test/*.test.ts",
+    "prove": "tsx scripts/prove-authorize.ts",
+    "verify:pack": "node scripts/verify-package-boundary.mjs",
+    "smoke:package": "node scripts/smoke-packed-package.mjs",
+    "prepack": "npm run build && npm run verify:pack"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "express": "^4.21.2",
+    "fastify": "^5.2.1",
+    "tsup": "^8.3.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  },
+  "peerDependencies": {
+    "express": "^4.21.0 || ^5.0.0",
+    "fastify": "^5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "express": { "optional": true },
+    "fastify": { "optional": true }
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CeibaLabs/ceiba-sdk-node.git"
+  },
+  "homepage": "https://github.com/CeibaLabs/ceiba-sdk-node#readme",
+  "bugs": {
+    "url": "https://github.com/CeibaLabs/ceiba-sdk-node/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "keywords": ["ceiba", "api", "express", "fastify", "middleware"],
   "author": "David Palacios"
 }
